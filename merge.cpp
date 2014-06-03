@@ -110,6 +110,7 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* Y     */ rhs+m,
 			/* INCY  */ 1);
 	std::cout << "4.2 ok" << std::endl;
+	
 	/* TODO: Comment this for production */
 	for(int i = 0; i < m; i++) 
 		for(int j = 0; j < i; j++) 
@@ -156,7 +157,7 @@ void solve(double * matrix, double * rhs, int n) {
 	+---+---+---+      +---+     ===   +---+---+---+      +---+
 	| B | A | 0 |}n    | E |}n   ===   | D'| E'| F'|      | L'|
 	+---+---+---+      +---+           +---+---+---+      +---+
-	| I | 0 | J |}n    | L |}n         | G'| I'| J'|      | M'|
+	| I | 0 | J |}n    | L |}n         | G'| H'| I'|      | M'|
 	+---+---+---+      +---+           +---+---+---+      +---+
 
 */
@@ -191,29 +192,29 @@ void add2(double * A, double * B, int n, int lda, int ldb) {
 void add(double * A1, double * A2, double * B1, double * B2, int n, double * outA, double * outB) {
 	double 
 		* A = A1,
-		* B = A1 + n,
-		* C = A1 + 2*n*n,
+		* B = A1 + 2*n*n,
+		* C = A1 + n,
 		* D = A1 + 2*n*n + n,
 		
 		* E = B1,
 		* F = B1 + n,
 		
 		* G = A2,
-		* H = A2 + n,
-		* I = A2 + 2*n*n,
+		* H = A2 + 2*n*n,
+		* I = A2 + n,
 		* J = A2 + 2*n*n + n,
 		
 		* K = B2,
 		* L = B2 + n,
 		
 		* oA = outA,
-		* oB = outA +             n,
-		* oC = outA +           2*n,
-		* oD = outA +   3*n*n,
+		* oB = outA +   3*n*n,
+		* oC = outA + 2*3*n*n,
+		* oD = outA +             n,
 		* oE = outA +   3*n*n +   n,
-		* oF = outA +   3*n*n + 2*n,
-		* oG = outA + 2*3*n*n,
-		* oH = outA + 2*3*n*n +   n,
+		* oF = outA + 2*3*n*n +   n,
+		* oG = outA +           2*n,
+		* oH = outA +   3*n*n + 2*n,
 		* oI = outA + 2*3*n*n + 2*n,
 		
 		* oK = outB,
@@ -226,8 +227,10 @@ void add(double * A1, double * A2, double * B1, double * B2, int n, double * out
 		oC = H
 		oD = B
 		oE = A
+		oF = 0
 		oG = I
-		oI = J
+		oH = 0
+		oI = I
 		
 		oK = F + K
 		oL = E
@@ -236,7 +239,7 @@ void add(double * A1, double * A2, double * B1, double * B2, int n, double * out
 	
 	copy2(oA, D, n, 3*n, 2*n);
 	 add2(oA, G, n, 3*n, 2*n);
-
+	
 	copy2(oB, C, n, 3*n, 2*n);
 	copy2(oC, H, n, 3*n, 2*n);
 	copy2(oD, B, n, 3*n, 2*n);
