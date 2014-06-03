@@ -1,5 +1,6 @@
 #include "merge.h"
 #include <cstdio>
+#include <iostream>
 #include <vector>
 extern "C" {
 	#include "vecLib/clapack.h"
@@ -20,7 +21,7 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* LDA  */ &n, // LDA = matrix_size
 			/* IPIV */ ipiv, 
 			/*      */ &status); // pivot vector
-
+	std::cout << "dgetrf " << status << std::endl;
     // 2.1
 	cblas_dtrsm(CblasColMajor,
 			/* SIDE  */ CblasLeft,
@@ -32,9 +33,9 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* ALPHA */ 1.0,
 			/* A     */ matrix,
 			/* LDA   */ n,
-			/* B     */ matrix+m,
+			/* B     */ matrix+m*n,
 			/* LDB   */ n);
-
+	std::cout << "2.1 ok" << std::endl;
     // 2.2
 	cblas_dtrsm(CblasColMajor,
 			/* SIDE  */ CblasLeft,
@@ -46,9 +47,9 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* ALPHA */ 1.0,
 			/* A     */ matrix,
 			/* LDA   */ n,
-			/* B     */ matrix+m,
+			/* B     */ matrix+m*n,
 			/* LDB   */ n);
-
+	std::cout << "2.2 ok" << std::endl;
     // 3.1
 	cblas_dtrsm(CblasColMajor,
 			/* SIDE  */ CblasLeft,
@@ -61,8 +62,8 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* A     */ matrix,
 			/* LDA   */ n,
 			/* B     */ rhs,
-			/* LDB   */ 1);
-
+			/* LDB   */ n);
+	std::cout << "3.1 ok" << std::endl;
     // 3.2
 	cblas_dtrsm(CblasColMajor,
 			/* SIDE  */ CblasLeft,
@@ -75,8 +76,8 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* A     */ matrix,
 			/* LDA   */ n,
 			/* B     */ rhs,
-			/* LDB   */ 1);
-
+			/* LDB   */ n);
+	std::cout << "3.2 ok" << std::endl;
     // 4.1 
 	cblas_dgemm(CblasColMajor,
 			/* TRANSA */ CblasNoTrans,
@@ -85,31 +86,34 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* N      */ k,
 			/* K      */ m,
 			/* ALPHA  */ -1.0,
-			/* A      */ &matrix[n*m],
+			/* A      */ matrix+m,
 			/* LDA    */ n,
-			/* B      */ matrix+m,
+			/* B      */ matrix+m*n,
 			/* LDB    */ n,
 			/* BETA   */ 1.0,
-			/* C      */ &matrix[n*m+m],
+			/* C      */ matrix+n*m+m,
 			/* LDC    */ n);
-
+	std::cout << "4.1 ok" << std::endl;
 	cblas_dgemv(CblasColMajor,
 			/* TRANS */ CblasNoTrans,
 			/* M     */ k,
 			/* N     */ m,
 			/* ALPHA */ -1.0,
-			/* A     */ &matrix[n*m],
+			/* A     */ matrix+m,
 			/* LDA   */ n,
 			/* X     */ rhs,
 			/* INCX  */ 1,
 			/* BETA  */ 1.0,
 			/* Y     */ rhs+m,
 			/* INCY  */ 1);
-
+	std::cout << "4.2 ok" << std::endl;
 	/* TODO: Comment this for production */
-	for(int i = 0; i < n; i++) 
+	for(int i = 0; i < m; i++) 
 		for(int j = 0; j < i; j++) 
-			matrix[i*n+j] = 0.0;
+			matrix[j*n+i] = 0.0;
+	for(int i = m; i < n; i++) 
+		for(int j = 0; j < m; j++) 
+			matrix[j*n+i] = 0.0;
 }
 
 void solve(double * matrix, double * rhs, int n) {

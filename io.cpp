@@ -62,7 +62,7 @@ void writeMatrix(double * m, int n) {
 void writeMatrixRhs(double * m, double * rhs, int n) {
     for(int i = 0; i < n; i++){
         for(int j = 0; j < n; j++) 
-            printf("%f  \t", m[j*n+i]);
-        printf(" | %5.2f\n", rhs[i]);
+            printf("%01.0f  \t", m[j*n+i]);
+        printf(" | %+07.0f\n", rhs[i]);
     }
 }

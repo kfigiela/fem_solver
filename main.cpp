@@ -7,7 +7,7 @@ int main(int argc, char ** argv)
 	int n = atoi(argv[1]);
 	int N = 3*n;
 
-	std::pair<double*,double*> Ap = readMatrixRhs(argv[2], 2*n);
+	std::pair<double*,double*> Ap = readMatrixRhs(argv[2], 6);
 	double* A  = Ap.first;
 	double* Ar = Ap.second;
 
@@ -21,10 +21,11 @@ int main(int argc, char ** argv)
 	add(A,B,Ar,Br,n,C,Cr);
 	
 	// eliminate(C, Cr, N, n);
+	eliminate(A, Ar, 6, 2);
 	// solve(C, Cr, N);
-	// solve(A, Ar, n);
+	// solve(A, Ar, 6);
 
-	writeMatrixRhs(A, Ar, 2*n);
+	writeMatrixRhs(A, Ar, 6);
 	// writeMatrixRhs(C, Cr, N);
 
 	return 0;
