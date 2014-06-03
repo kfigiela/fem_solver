@@ -21,7 +21,10 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* LDA  */ &n, // LDA = matrix_size
 			/* IPIV */ ipiv, 
 			/*      */ &status); // pivot vector
-	std::cout << "dgetrf " << status << std::endl;
+	
+	if(status != 0) {
+		std::cout << "!!!!!!!!!!!!!!!!!dgetrf returned" << status << std::endl;
+	}
     // 2.1
 	cblas_dtrsm(CblasColMajor,
 			/* SIDE  */ CblasLeft,
