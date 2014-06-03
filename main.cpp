@@ -1,5 +1,5 @@
 #include <cstdio>
-#include "merge.h"
+#include "operations.h"
 #include "io.h"
 
 int main(int argc, char ** argv)
