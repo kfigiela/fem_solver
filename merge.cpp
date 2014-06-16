@@ -4,6 +4,12 @@
 
 int main(int argc, char ** argv)
 {
+	
+	if(argc != 6) {
+		std::cout << "usage: solve inLeftMatrix inRightMatrix outState outMatrix" << std::endl;
+		exit(1);
+	}
+
 	int n = atoi(argv[1]);
 	int N = 3*n;
 
@@ -19,15 +25,19 @@ int main(int argc, char ** argv)
 	double* Cr = new double[N];
 
 	add(A,B,Ar,Br,n,C,Cr);
-	writeMatrixRhs(C, Cr, N);
-	std::cout << "elimination" << std::endl;
-	eliminate(C, Cr, N, n);
-	// eliminate(A, Ar, 6, 2);
-	// solve(C, Cr, N);
-	// solve(A, Ar, 6);
 
-	// writeMatrixRhs(A, Ar, 6);
+	writeState(argv[4], C, Cr, N, n);
+
 	writeMatrixRhs(C, Cr, N);
+	std::cout << std::endl;
+
+	eliminate(C, Cr, N, n);
+
+	writeMatrixRhs(C, Cr, N);
+	std::cout << std::endl;
+
+	// writeState(argv[4], C, Cr, N, n);
+	writeExport(argv[5], C, Cr, N, n);
 
 	return 0;
 }

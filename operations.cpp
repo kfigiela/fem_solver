@@ -23,14 +23,14 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/*      */ &status); // pivot vector
 	
 	if(status != 0) {
-		std::cout << "!!!!!!!!!!!!!!!!!dgetrf returned" << status << std::endl;
+		std::cerr << "!!!!!!!!!!!!!!!!!dgetrf returned" << status << std::endl;
 	}
     // 2.1
 	cblas_dtrsm(CblasColMajor,
 			/* SIDE  */ CblasLeft,
 			/* UPLO  */ CblasLower,
 			/* TRANS */ CblasNoTrans,
-			/* DIAG  */ CblasUnit,
+			/* DIAG  */ CblasNonUnit,
 			/* M     */ m,
 			/* N     */ k,
 			/* ALPHA */ 1.0,
@@ -38,7 +38,6 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* LDA   */ n,
 			/* B     */ matrix+m*n,
 			/* LDB   */ n);
-	std::cout << "2.1 ok" << std::endl;
     // 2.2
 	cblas_dtrsm(CblasColMajor,
 			/* SIDE  */ CblasLeft,
@@ -52,13 +51,12 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* LDA   */ n,
 			/* B     */ matrix+m*n,
 			/* LDB   */ n);
-	std::cout << "2.2 ok" << std::endl;
     // 3.1
 	cblas_dtrsm(CblasColMajor,
 			/* SIDE  */ CblasLeft,
 			/* UPLO  */ CblasLower,
 			/* TRANS */ CblasNoTrans,
-			/* DIAG  */ CblasUnit,
+			/* DIAG  */ CblasNonUnit,
 			/* M     */ m,
 			/* N     */ 1,
 			/* ALPHA */ 1.0,
@@ -66,8 +64,7 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* LDA   */ n,
 			/* B     */ rhs,
 			/* LDB   */ n);
-	std::cout << "3.1 ok" << std::endl;
-    // 3.2
+	// 3.2
 	cblas_dtrsm(CblasColMajor,
 			/* SIDE  */ CblasLeft,
 			/* UPLO  */ CblasUpper,
@@ -80,8 +77,7 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* LDA   */ n,
 			/* B     */ rhs,
 			/* LDB   */ n);
-	std::cout << "3.2 ok" << std::endl;
-    // 4.1 
+	    // 4.1 
 	cblas_dgemm(CblasColMajor,
 			/* TRANSA */ CblasNoTrans,
 			/* TRANSB */ CblasNoTrans,
@@ -96,7 +92,6 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* BETA   */ 1.0,
 			/* C      */ matrix+n*m+m,
 			/* LDC    */ n);
-	std::cout << "4.1 ok" << std::endl;
 	cblas_dgemv(CblasColMajor,
 			/* TRANS */ CblasNoTrans,
 			/* M     */ k,
@@ -109,9 +104,8 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* BETA  */ 1.0,
 			/* Y     */ rhs+m,
 			/* INCY  */ 1);
-	std::cout << "4.2 ok" << std::endl;
 	
-	/* TODO: Comment this for production */
+	// /* TODO: Comment this for production */
 	for(int i = 0; i < m; i++) 
 		for(int j = 0; j < i; j++) 
 			matrix[j*n+i] = 0.0;
@@ -248,45 +242,12 @@ void add(double * A1, double * A2, double * B1, double * B2, int n, double * out
 	copy2(oG, I, n, 3*n, 2*n);
 	zero2(oH, n, 3*n);
 	copy2(oI, J, n, 3*n, 2*n);
-	
-	
+		
 	memcpy(oK, F, n*sizeof(double));
 	for(int i = 0; i < n; i++)
 		oK[i] += K[i];
 	
 	memcpy(oL, E, n*sizeof(double));
 	memcpy(oM, L, n*sizeof(double));
-	
-}
-
-void testAdd() {
-	
-	double A[4][4] = {
-			{ 11,  12, 21,  22 },
-			{ 13,  14, 23,  24 },
-			{ 31,  32, 41,  42 },
-			{ 33,  34, 43,  44 }
-	};
-	
-	double B[4][4] = {
-		{ 1100,  1200, 2100,  2200 },
-		{ 1300,  1400, 2300,  2400 },
-		{ 3100,  3200, 4100,  4200 },
-		{ 3300,  3400, 4300,  4400 }
-	};
-	
-	double C[6][6];
-	
-	double Ar[4] = {11,12,21,22};
-	double Br[4] = {3100,3200,4100,4200};
-	double Cr[6];
-
-	add(A[0],B[0],Ar,Br,2,C[0],Cr);
-    for(int i = 0; i < 6; i++){
-        for(int j = 0; j < 6; j++) 
-            printf("%4.0f  \t", C[i][j]);
-	    printf(" | %f  ", Cr[i]);	
-        printf("\n");
-    }
 	
 }

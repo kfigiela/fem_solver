@@ -4,7 +4,7 @@ import numpy
 import scipy
 import scipy.linalg
 
-L = 20
+L = 3
 N = 2**L
 h = 1./N
 hh = h*h
@@ -164,19 +164,19 @@ t = gen_tree(L)
 
 t.up()
 
-# g = open('test1.dot', 'w')
-# g.write("digraph g {\n")
-# print_tree(g, t)
-# g.write("}\n")
-# g.close()
-# 
+g = open('test1.dot', 'w')
+g.write("digraph g {\n")
+print_tree(g, t)
+g.write("}\n")
+g.close()
+
 
 t.down()
-# g = open('test2.dot', 'w')
-# g.write("digraph g {\n")
-# print_tree(g, t)
-# g.write("}\n")
-# g.close()
+g = open('test2.dot', 'w')
+g.write("digraph g {\n")
+print_tree(g, t)
+g.write("}\n")
+g.close()
 
 
 
