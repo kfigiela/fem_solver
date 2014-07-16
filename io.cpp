@@ -1,4 +1,5 @@
 #include "io.h"
+#include <boost/format.hpp>
 
 double * readMatrix(std::string filename, int n) {
 	std::fstream f(filename, std::ios_base::in);
@@ -57,7 +58,7 @@ double * readVector(std::istream& f, int n) {
 void writeMatrix(double * m, int n) {
     for(int i = 0; i < n; i++){
         for(int j = 0; j < n; j++) 
-            printf("%f  \t", m[j*n+i]);
+            printf("%e  \t", m[j*n+i]);
         printf("\n");
     }
 }
@@ -65,23 +66,47 @@ void writeMatrix(double * m, int n) {
 void writeMatrixRhs(double * m, double * rhs, int n) {
     for(int i = 0; i < n; i++){
         for(int j = 0; j < n; j++) 
-            printf("%5.1f\t", m[j*n+i]);
-        printf(" | %8.2f\n", rhs[i]);
+            printf("%6.3e ", m[j*n+i]);
+        printf(" | %6.3e\n", rhs[i]);
+    }
+}
+void writeRhs(double * rhs, int n) {
+    for(int i = 0; i < n; i++){
+        printf("%11.6e\n", rhs[i]);
+    }
+}
+
+void writeRhs(std::fstream& f, double * rhs, int n) {
+    for(int i = 0; i < n; i++){
+        f << boost::format("%+16.10e") % rhs[i] << "\n";
+    }
+}
+
+void writeRhs(std::string filename, double * rhs, int n) {
+	std::fstream f(filename, std::ios_base::out);
+	return writeRhs(f, rhs, n);
+}
+
+void writeMatrixRhs(double * m, double * rhs, int n, int row_start, int N) {
+    for(int i = row_start; i < N; i++){
+        for(int j = 0; j < n; j++) 
+            printf("%+16.10e\t", m[j*n+i]);
+        printf(" | %+16.10e\n", rhs[i]);
     }
 }
 
 void writeState(std::ostream& f, double * m, double * rhs, int N, int n) {
     for(int i = 0; i < n; i++){
         for(int j = 0; j < N; j++) 
-            f << m[j*N+i] << "\t";
-        f << rhs[i] << "\n";
+            f << boost::format("%+16.10e") % m[j*N+i] << "\t";
+        f << boost::format("%+16.10e") %  rhs[i] << "\n";
 	}
 }
 void writeExport(std::ostream&f, double * m, double * rhs, int N, int n) {	
     for(int i = n; i < N; i++){
         for(int j = n; j < N; j++) 
-            f << m[j*N+i] << "\t";
-        f << rhs[i] << "\n";
+            f << boost::format("%+16.10e") % m[j*N+i] << "\t";
+        f << boost::format("%+16.10e") % rhs[i] << "\n";
 	}
 }
 

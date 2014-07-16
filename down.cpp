@@ -6,7 +6,7 @@ int main(int argc, char ** argv)
 {
 	
 	if(argc != 6) {
-		std::cout << "usage: solve inState inRhs outRhs" << std::endl;
+		std::cout << "usage: " << argv[0] << " N inState inRhs outRhs" << std::endl;
 		exit(1);
 	}
 
@@ -37,13 +37,13 @@ int main(int argc, char ** argv)
 	}
 
 
-	writeMatrixRhs(C, Cr, N);
-	std::cout << std::endl;
+	// writeMatrixRhs(C, Cr, N);
+	// std::cout << std::endl;
 
 	solve(C, Cr, N);
 
-	writeMatrixRhs(C, Cr, N);
-	std::cout << std::endl;
+	// writeRhs(Cr, N);
+	// std::cout << std::endl;
 
 	writeLeftRhs(argv[4], C, Cr, N, n);
 	writeRightRhs(argv[5], C, Cr, N, n);

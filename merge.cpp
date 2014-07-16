@@ -26,19 +26,10 @@ int main(int argc, char ** argv)
 
 	add(A,B,Ar,Br,n,C,Cr);
 
-	writeState(argv[4], C, Cr, N, n);
-
-	writeMatrixRhs(C, Cr, N);
-	std::cout << std::endl;
-
 	eliminate(C, Cr, N, n);
 
-	writeMatrixRhs(C, Cr, N);
-	std::cout << std::endl;
-
-	// writeState(argv[4], C, Cr, N, n);
+	writeState(argv[4], C, Cr, N, n);
 	writeExport(argv[5], C, Cr, N, n);
-
 	return 0;
 }
 

@@ -3,3 +3,9 @@ down
 eliminate
 solve
 merge
+production_A1
+production_A
+production_AN
+down_A
+tsolve
+*.o

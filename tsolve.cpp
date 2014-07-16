@@ -4,15 +4,15 @@
 
 int main(int argc, char ** argv)
 {
-	int n = atoi(argv[1]);
-	int N = atoi(argv[2]);
+	int N = atoi(argv[1]);
 
-	std::pair<double*,double*> Ap = readMatrixRhs(argv[3], N);
+	std::pair<double*,double*> Ap = readMatrixRhs(argv[2], N);
 	double* A  = Ap.first;
 	double* Ar = Ap.second;
 
-	eliminate(A, Ar, N, n);
-	writeMatrixRhs(A, Ar, N);
+	solve(A, Ar, N);	
+	
+	writeRhs(Ar, N);
 
 	return 0;
 }

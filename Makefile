@@ -1,6 +1,7 @@
 CXX_FLAGS=-DYA_BLAS -DYA_LAPACK -DYA_BLASMULT
-LIBS= -lblas -llapack -framework vecLib
+LDLIBS= -lblas -llapack -framework vecLib
 CXX=clang++
+
 
 SRCS = io.cpp operations.cpp
 OBJS = $(SRCS:.cpp=.o)
@@ -8,28 +9,29 @@ MAIN = add.cpp eliminate.cpp merge.cpp
 
 .PHONY: depend clean
 
-all:	add eliminate merge solve down
+# all:	add.out eliminate.out merge.out solve.out down.out production_A.out production_A1.out production_AN.out tsolve.out down_A.out
+all: add eliminate merge solve down production_AN production_A1 production_A tsolve down_A
 
-add: 	add.cpp $(SRCS)
-		$(CXX) $(CFXXLAGS) $(INCLUDES) -o add $(SRCS) add.cpp $(LFLAGS) $(LIBS)
+add: $(OBJS)
+eliminate: $(OBJS)
+merge: $(OBJS)
+solve: $(OBJS)
+down: $(OBJS)
+production_A1: $(OBJS)
+production_A: $(OBJS)
+production_AN: $(OBJS)
+tsolve: $(OBJS)
+down_A: $(OBJS)
 
-eliminate: 	eliminate.cpp $(SRCS)
-		$(CXX) $(CFXXLAGS) $(INCLUDES) -o eliminate $(SRCS) eliminate.cpp $(LFLAGS) $(LIBS)
-
-merge: 	merge.cpp $(SRCS)
-		$(CXX) $(CFXXLAGS) $(INCLUDES) -o merge $(SRCS) merge.cpp $(LFLAGS) $(LIBS)
-
-solve: 	solve.cpp $(SRCS)
-		$(CXX) $(CFXXLAGS) $(INCLUDES) -o solve $(SRCS) solve.cpp $(LFLAGS) $(LIBS)
-
-down: 	down.cpp $(SRCS)
-		$(CXX) $(CFXXLAGS) $(INCLUDES) -o down $(SRCS) down.cpp $(LFLAGS) $(LIBS)
+%: %.o $(OBJS)
+	$(CXX) $< $(OBJS) -o $@ $(LFLAGS) $(LIBS)
+	ln -s $@ $(@:.out=)
 
 .o:
 		$(CXX) $(CFXXLAGS) $(INCLUDES) -c $<  -o $@
 
 clean:
-		$(RM) *.o *~ $(MAIN)
+		$(RM) *.o *~
 
 depend: $(SRCS)
 		makedepend $(INCLUDES) $^

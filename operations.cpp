@@ -7,77 +7,56 @@ extern "C" {
 	#include "vecLib/cblas.h"
 }
 
+
 void eliminate(double * matrix, double * rhs, int n, int m) {
+
+/*
+	
+	+---+---+       +---+             +----+---+       +---+  
+	| A | B |}m     | E |}n           |Diag| B'|}m     | E'|}n
+	+---+---+       +---+       =>    +----+---+       +---+  
+	| C | D |}k     | F |}k           | 0  | D'|}k     | F'|}k
+	+---+---+       +---+             +----+---+       +---+  
+	  ^   ^                             ^   ^
+	  m   k	                            m   k	
+*/
 
     int status;
 	int ipiv[m];
 	int k = n - m;
+	char LapackNoTrans = 'N';
 	
-    // 1
+    // 1: LU factorize A
 	dgetrf_(
 			/* M    */ &m, // size
 			/* N    */ &m,
 			/* A    */ matrix, // pointer to data
 			/* LDA  */ &n, // LDA = matrix_size
-			/* IPIV */ ipiv, 
-			/*      */ &status); // pivot vector
-	
+			/* IPIV */ ipiv, // pivot vector
+			/*      */ &status); 
+
 	if(status != 0) {
-		std::cerr << "!!!!!!!!!!!!!!!!!dgetrf returned" << status << std::endl;
+		std::cerr << "!!!!!!!!!!!!!!!!!dgetrf returned " << status << std::endl;
 	}
-    // 2.1
-	cblas_dtrsm(CblasColMajor,
-			/* SIDE  */ CblasLeft,
-			/* UPLO  */ CblasLower,
-			/* TRANS */ CblasNoTrans,
-			/* DIAG  */ CblasNonUnit,
-			/* M     */ m,
-			/* N     */ k,
-			/* ALPHA */ 1.0,
-			/* A     */ matrix,
-			/* LDA   */ n,
-			/* B     */ matrix+m*n,
-			/* LDB   */ n);
-    // 2.2
-	cblas_dtrsm(CblasColMajor,
-			/* SIDE  */ CblasLeft,
-			/* UPLO  */ CblasUpper,
-			/* TRANS */ CblasNoTrans,
-			/* DIAG  */ CblasUnit,
-			/* M     */ m,
-			/* N     */ k,
-			/* ALPHA */ 1.0,
-			/* A     */ matrix,
-			/* LDA   */ n,
-			/* B     */ matrix+m*n,
-			/* LDB   */ n);
-    // 3.1
-	cblas_dtrsm(CblasColMajor,
-			/* SIDE  */ CblasLeft,
-			/* UPLO  */ CblasLower,
-			/* TRANS */ CblasNoTrans,
-			/* DIAG  */ CblasNonUnit,
-			/* M     */ m,
-			/* N     */ 1,
-			/* ALPHA */ 1.0,
-			/* A     */ matrix,
-			/* LDA   */ n,
-			/* B     */ rhs,
-			/* LDB   */ n);
-	// 3.2
-	cblas_dtrsm(CblasColMajor,
-			/* SIDE  */ CblasLeft,
-			/* UPLO  */ CblasUpper,
-			/* TRANS */ CblasNoTrans,
-			/* DIAG  */ CblasUnit,
-			/* M     */ m,
-			/* N     */ 1,
-			/* ALPHA */ 1.0,
-			/* A     */ matrix,
-			/* LDA   */ n,
-			/* B     */ rhs,
-			/* LDB   */ n);
-	    // 4.1 
+
+
+    // 2: B = A^-1 * B
+	dgetrs_( &LapackNoTrans, &m, &k, matrix, &n, ipiv, matrix+m*n, &n, &status );
+
+	if(status != 0) {
+		std::cerr << "!!!!!!!!!!!!!!!!!dgetrs returned " << status << std::endl;
+	}
+
+
+    // 3: E = A^-1 * E	
+	int one = 1;
+	dgetrs_( &LapackNoTrans, &m, &one, matrix, &n, ipiv, rhs, &n, &status );
+
+	if(status != 0) {
+		std::cerr << "!!!!!!!!!!!!!!!!!dgetrs returned " << status << std::endl;
+	}
+
+	// 4: D = D - C * B
 	cblas_dgemm(CblasColMajor,
 			/* TRANSA */ CblasNoTrans,
 			/* TRANSB */ CblasNoTrans,
@@ -92,6 +71,8 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* BETA   */ 1.0,
 			/* C      */ matrix+n*m+m,
 			/* LDC    */ n);
+
+	// 5: F = F - C * E
 	cblas_dgemv(CblasColMajor,
 			/* TRANS */ CblasNoTrans,
 			/* M     */ k,
@@ -104,11 +85,17 @@ void eliminate(double * matrix, double * rhs, int n, int m) {
 			/* BETA  */ 1.0,
 			/* Y     */ rhs+m,
 			/* INCY  */ 1);
-	
-	// /* TODO: Comment this for production */
+
+	// 6: Zero matrix A
 	for(int i = 0; i < m; i++) 
-		for(int j = 0; j < i; j++) 
+		for(int j = 0; j < m; j++) 
 			matrix[j*n+i] = 0.0;
+
+	// 7: Set 1 on diagonal of A
+	for(int i = 0; i < m; i++) 
+		matrix[i*n+i] = 1.0;	
+
+	// 8: Zero matrix C
 	for(int i = m; i < n; i++) 
 		for(int j = 0; j < m; j++) 
 			matrix[j*n+i] = 0.0;
@@ -128,7 +115,9 @@ void solve(double * matrix, double * rhs, int n) {
 		/* LDB   */ &n,
 		/* INFO  */ &status
 	);
-	printf("solve status: %d\n", status);
+	if(status != 0) {
+		std::cerr << "!!!!!!!!!!!!!!!!!dgesv returned " << status << std::endl;
+	}
 }
 
 /*
@@ -162,6 +151,14 @@ void copy2(double * A, double * B, int n, int lda, int ldb) {
 		ptrA = A + i * lda;
 		ptrB = B + i * ldb;
 		memcpy(ptrA, ptrB, n*sizeof(double));
+	}
+}
+void copy_rc(double * A, double * B, int rows, int cols, int lda, int ldb) {
+	double *ptrA, *ptrB;
+	for(int i = 0; i < cols; i++) {
+		ptrA = A + i * lda;
+		ptrB = B + i * ldb;
+		memcpy(ptrA, ptrB, rows*sizeof(double));
 	}
 }
 
@@ -250,4 +247,95 @@ void add(double * A1, double * A2, double * B1, double * B2, int n, double * out
 	memcpy(oL, E, n*sizeof(double));
 	memcpy(oM, L, n*sizeof(double));
 	
+}
+
+
+void production_A(double * outA, double * outB, double * inA, double * inB, size_t interfaceSize, size_t matrixSize) {
+	size_t interiorSize = matrixSize - 2*interfaceSize;
+
+	double 
+		* A = inA,
+		* B = inA + matrixSize * interfaceSize,
+		* C = inA + matrixSize * (interfaceSize + interiorSize),
+		* D = inA + interfaceSize,
+		* E = inA + matrixSize * interfaceSize + interfaceSize,
+		* F = inA + matrixSize * (interfaceSize + interiorSize) + interfaceSize,
+		* G = inA + interfaceSize + interiorSize,
+		* H = inA + matrixSize * interfaceSize + interfaceSize + interiorSize,
+		* I = inA + matrixSize * (interfaceSize + interiorSize) + interfaceSize + interiorSize,
+		
+		* oA = outA,
+		* oB = outA + matrixSize * interiorSize,
+		* oC = outA + matrixSize * (interfaceSize + interiorSize),
+		* oD = outA + interiorSize,
+		* oE = outA + matrixSize * interiorSize + interiorSize,
+		* oF = outA + matrixSize * (interfaceSize + interiorSize) + interiorSize,
+		* oG = outA + interiorSize + interfaceSize,
+		* oH = outA + matrixSize * interiorSize + interiorSize + interfaceSize,
+		* oI = outA + matrixSize * (interfaceSize + interiorSize) + interiorSize + interfaceSize,
+		
+		* K = inB,
+		* L = inB + interfaceSize,
+		* M = inB + interfaceSize + interiorSize,
+		
+		* oK = outB,
+		* oL = outB + interiorSize,
+		* oM = outB + interfaceSize + interiorSize;
+			
+	
+	// A<->E
+	copy_rc(oA, E, interiorSize, interiorSize, matrixSize, matrixSize );
+	copy_rc(oE, A, interfaceSize, interfaceSize, matrixSize, matrixSize );
+	
+	// B<->D
+	copy_rc(oB, D, interiorSize, interfaceSize, matrixSize, matrixSize );
+	copy_rc(oD, B, interfaceSize, interiorSize, matrixSize, matrixSize );
+	
+	// G<->H
+	copy_rc(oG, H, interfaceSize, interiorSize, matrixSize, matrixSize );
+	copy_rc(oH, G, interfaceSize, interfaceSize, matrixSize, matrixSize );
+
+	// C<->F
+	copy_rc(oC, F, interiorSize, interfaceSize, matrixSize, matrixSize );
+	copy_rc(oF, C, interfaceSize, interfaceSize, matrixSize, matrixSize );
+	
+	// I
+	copy_rc(oI, I, interfaceSize, interfaceSize, matrixSize, matrixSize);
+	
+	memcpy(oL, K, interfaceSize * sizeof(double));
+	memcpy(oK, L, interiorSize  * sizeof(double));
+	memcpy(oM, M, interfaceSize * sizeof(double));
+}
+
+void production_AN(double * outA, double * outB, double * inA, double * inB, size_t interfaceSize, size_t matrixSize) {
+	size_t interiorSize = matrixSize - interfaceSize;
+
+	double 
+		* A = inA,
+		* B = inA + matrixSize * interfaceSize,
+		* C = inA + interfaceSize,
+		* D = inA + matrixSize*interfaceSize + interfaceSize,
+		
+		* oA = outA,
+		* oB = outA + matrixSize * interiorSize,
+		* oC = outA + interiorSize,
+		* oD = outA + matrixSize * interiorSize + interiorSize,
+		
+		* K = inB,
+		* L = inB + interfaceSize,
+		
+		* oK = outB,
+		* oL = outB + interiorSize;
+			
+	
+	// A<->D
+	copy_rc(oA, D, interiorSize, interiorSize, matrixSize, matrixSize );
+	copy_rc(oD, A, interfaceSize, interfaceSize, matrixSize, matrixSize );
+	
+	// C<->B
+	copy_rc(oB, C, interiorSize, interfaceSize, matrixSize, matrixSize );
+	copy_rc(oC, B, interfaceSize, interiorSize, matrixSize, matrixSize );
+	
+	memcpy(oL, K, interfaceSize * sizeof(double));
+	memcpy(oK, L, interiorSize  * sizeof(double));
 }
