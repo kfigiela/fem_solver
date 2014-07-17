@@ -3,8 +3,10 @@
 #include "operations.h"
 #include "io.h"
 
+
 int main(int argc, char ** argv)
 {
+	boost::format outFormat("%30.25e");
 	
 	if(argc != 7) {
 		std::cout << "usage: " << argv[0] << " 1|A|N matrixSize interfaceSize inState inRhs outRhs" << std::endl;
@@ -42,19 +44,19 @@ int main(int argc, char ** argv)
 	switch(argv[1][0]) {
 		case '1':
 			for(int i = 0; i < matrixSize-interfaceSize; ++i)
-				f << boost::format("%+16.10e") % Cr[i] << std::endl;
+				f << outFormat % Cr[i] << std::endl;
 			break;
 		case 'A':
 			for(int i = interiorSize; i < interiorSize+interfaceSize; ++i)
-				f << boost::format("%+16.10e") % Cr[i] << std::endl;
+				f << outFormat % Cr[i] << std::endl;
 			for(int i = 0; i < interiorSize; ++i)
-				f << boost::format("%+16.10e") % Cr[i] << std::endl;
+				f << outFormat % Cr[i] << std::endl;
 			break;
 		case 'N':
 			for(int i = matrixSize-interfaceSize; i < matrixSize; ++i)
-				f << boost::format("%+16.10e") % Cr[i] << std::endl;
+				f << outFormat % Cr[i] << std::endl;
 			for(int i = 0; i < matrixSize-interfaceSize; ++i)
-				f << boost::format("%+16.10e") % Cr[i] << std::endl;
+				f << outFormat % Cr[i] << std::endl;
 			break;
 		default:
 			std::cerr << "Invalid argument (expected 1, A or N)" << std::endl;

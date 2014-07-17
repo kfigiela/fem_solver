@@ -1,6 +1,8 @@
 #include "io.h"
 #include <boost/format.hpp>
 
+boost::format outFormat("%30.25e");
+
 double * readMatrix(std::string filename, int n) {
 	std::fstream f(filename, std::ios_base::in);
 	return readMatrix(f, n);
@@ -78,7 +80,7 @@ void writeRhs(double * rhs, int n) {
 
 void writeRhs(std::fstream& f, double * rhs, int n) {
     for(int i = 0; i < n; i++){
-        f << boost::format("%+16.10e") % rhs[i] << "\n";
+        f << outFormat % rhs[i] << "\n";
     }
 }
 
@@ -98,15 +100,15 @@ void writeMatrixRhs(double * m, double * rhs, int n, int row_start, int N) {
 void writeState(std::ostream& f, double * m, double * rhs, int N, int n) {
     for(int i = 0; i < n; i++){
         for(int j = 0; j < N; j++) 
-            f << boost::format("%+16.10e") % m[j*N+i] << "\t";
-        f << boost::format("%+16.10e") %  rhs[i] << "\n";
+            f << outFormat % m[j*N+i] << "\t";
+        f << outFormat % rhs[i] << "\n";
 	}
 }
 void writeExport(std::ostream&f, double * m, double * rhs, int N, int n) {	
     for(int i = n; i < N; i++){
         for(int j = n; j < N; j++) 
-            f << boost::format("%+16.10e") % m[j*N+i] << "\t";
-        f << boost::format("%+16.10e") % rhs[i] << "\n";
+            f << outFormat % m[j*N+i] << "\t";
+        f << outFormat % rhs[i] << "\n";
 	}
 }
 

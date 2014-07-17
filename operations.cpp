@@ -309,33 +309,35 @@ void production_A(double * outA, double * outB, double * inA, double * inB, size
 
 void production_AN(double * outA, double * outB, double * inA, double * inB, size_t interfaceSize, size_t matrixSize) {
 	size_t interiorSize = matrixSize - interfaceSize;
+	size_t fakeInterfaceSize = 2*interfaceSize;
+	size_t fakeInteriorSize = matrixSize - 2*interfaceSize;
 
 	double 
 		* A = inA,
-		* B = inA + matrixSize * interfaceSize,
-		* C = inA + interfaceSize,
-		* D = inA + matrixSize*interfaceSize + interfaceSize,
+		* B = inA + matrixSize * fakeInterfaceSize,
+		* C = inA + fakeInterfaceSize,
+		* D = inA + matrixSize*fakeInterfaceSize + fakeInterfaceSize,
 		
 		* oA = outA,
-		* oB = outA + matrixSize * interiorSize,
-		* oC = outA + interiorSize,
-		* oD = outA + matrixSize * interiorSize + interiorSize,
+		* oB = outA + matrixSize * fakeInteriorSize,
+		* oC = outA + fakeInteriorSize,
+		* oD = outA + matrixSize * fakeInteriorSize + fakeInteriorSize,
 		
 		* K = inB,
-		* L = inB + interfaceSize,
+		* L = inB + fakeInterfaceSize,
 		
 		* oK = outB,
-		* oL = outB + interiorSize;
+		* oL = outB + fakeInteriorSize;
 			
 	
 	// A<->D
-	copy_rc(oA, D, interiorSize, interiorSize, matrixSize, matrixSize );
-	copy_rc(oD, A, interfaceSize, interfaceSize, matrixSize, matrixSize );
+	copy_rc(oA, D, fakeInteriorSize, fakeInteriorSize, matrixSize, matrixSize );
+	copy_rc(oD, A, fakeInterfaceSize, fakeInterfaceSize, matrixSize, matrixSize );
 	
 	// C<->B
-	copy_rc(oB, C, interiorSize, interfaceSize, matrixSize, matrixSize );
-	copy_rc(oC, B, interfaceSize, interiorSize, matrixSize, matrixSize );
+	copy_rc(oB, C, fakeInteriorSize, fakeInterfaceSize, matrixSize, matrixSize );
+	copy_rc(oC, B, fakeInterfaceSize, fakeInteriorSize, matrixSize, matrixSize );
 	
-	memcpy(oL, K, interfaceSize * sizeof(double));
-	memcpy(oK, L, interiorSize  * sizeof(double));
+	memcpy(oL, K, fakeInterfaceSize * sizeof(double));
+	memcpy(oK, L, fakeInteriorSize  * sizeof(double));
 }
