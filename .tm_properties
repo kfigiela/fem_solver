@@ -1,1 +1,3 @@
 TM_CXX_FLAGS="-DYA_BLAS -DYA_LAPACK -DYA_BLASMULT -lblas -llapack -framework vecLib io.cpp merge.cpp"
+
+TM_MARKDOWN_MATHJAX=1
