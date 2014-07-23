@@ -53,9 +53,9 @@ int main(int argc, char ** argv)
 				f << outFormat % Cr[i] << std::endl;
 			break;
 		case 'N':
-			for(int i = matrixSize-interfaceSize; i < matrixSize; ++i)
+			for(int i = matrixSize-2*interfaceSize; i < matrixSize; ++i)
 				f << outFormat % Cr[i] << std::endl;
-			for(int i = 0; i < matrixSize-interfaceSize; ++i)
+			for(int i = 0; i < matrixSize-2*interfaceSize; ++i)
 				f << outFormat % Cr[i] << std::endl;
 			break;
 		default:
