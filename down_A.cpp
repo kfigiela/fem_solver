@@ -43,13 +43,17 @@ int main(int argc, char ** argv)
 	std::fstream f(argv[6], std::ios_base::out);
 	switch(argv[1][0]) {
 		case '1':
-			for(int i = 0; i < matrixSize-interfaceSize; ++i)
+			for(int i = 0; i < matrixSize; ++i)
 				f << outFormat % Cr[i] << std::endl;
+			// for(int i = 0; i < matrixSize-interfaceSize; ++i)
+			// 	f << outFormat % Cr[i] << std::endl;
 			break;
 		case 'A':
 			for(int i = interiorSize; i < interiorSize+interfaceSize; ++i)
 				f << outFormat % Cr[i] << std::endl;
 			for(int i = 0; i < interiorSize; ++i)
+				f << outFormat % Cr[i] << std::endl;
+			for(int i = interiorSize+interfaceSize; i < matrixSize; ++i)
 				f << outFormat % Cr[i] << std::endl;
 			break;
 		case 'N':

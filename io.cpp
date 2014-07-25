@@ -92,8 +92,8 @@ void writeRhs(std::string filename, double * rhs, int n) {
 void writeMatrixRhs(double * m, double * rhs, int n, int row_start, int N) {
     for(int i = row_start; i < N; i++){
         for(int j = 0; j < n; j++) 
-            printf("%+16.10e\t", m[j*n+i]);
-        printf(" | %+16.10e\n", rhs[i]);
+            printf("%+16.10f\t", m[j*n+i]);
+        printf(" | %+16.10f\n", rhs[i]);
     }
 }
 

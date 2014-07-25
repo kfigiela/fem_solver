@@ -15,10 +15,10 @@ Usage:
 
 args = docopt(doc, version: '1.0')
 
-interfaceSize = parseInt(args.interfaceSize)
-leafSize      = parseInt(args.leafSize)
-a1Size        = parseInt(args.a1Size)
-anSize        = parseInt(args.anSize)
+interfaceSize = parseInt(args['--interfaceSize'])
+leafSize      = parseInt(args['--leafSize'])
+a1Size        = parseInt(args['--a1Size'])
+anSize        = parseInt(args['--anSize'])
 tierCount     = parseInt(args['<tierCount>'])
 
 generate_tree = -> 
@@ -56,14 +56,14 @@ generate_workflow = (tree) ->
   workflow = 
     functions: [
       {
-        "name": "command_print",
+        "name": "command",
         "module": "functions"
       }
     ]
   tasks = [
         {
           name: "solve",
-          function: "command_print",
+          function: "command",
           type: "dataflow",
           firingLimit: 1,
           config: {
@@ -78,13 +78,45 @@ generate_workflow = (tree) ->
   ]
     
   generate_bs = (subtree) ->
+    
+    add_leaf = (tier_index, subtree_id, size, type) ->
+      tasks.push({
+        name: "down_A",
+        function: "command",
+        type: "dataflow",
+        firingLimit: 1,
+        config: {
+          executor: {
+            executable: "down_A",
+            args: "#{type} #{size} #{interfaceSize} tier_#{tier_index}_state #{subtree_id}_rhs tier_#{tier_index}_solution"
+          }
+        },
+        ins: ["tier_#{tier_index}_state", "#{subtree_id}_rhs"],
+        outs: ["tier_#{tier_index}_solution"]
+      })
+    add_postprocess = (tier_index) ->
+      tasks.push({
+        name: "postprocess",
+        function: "command",
+        type: "dataflow",
+        firingLimit: 1,
+        config: {
+          executor: {
+            executable: "postprocessor",
+            args: "#{tierCount} #{tier_index} tier_#{tier_index}_solution tier_#{tier_index}_results"
+          }
+        },
+        ins: ["tier_#{tier_index}_solution"],
+        outs: ["tier_#{tier_index}_results"]
+      })
+    
     switch subtree.type
       when "eliminate"
         generate_bs(subtree.left)
         generate_bs(subtree.right)
         tasks.push({
           name: "down",
-          function: "command_print",
+          function: "command",
           type: "dataflow",
           firingLimit: 1,
           config: {
@@ -97,58 +129,21 @@ generate_workflow = (tree) ->
           outs: ["#{subtree.left.id}_rhs", "#{subtree.right.id}_rhs"]
         })
       when "leaf"
-        tasks.push({
-          name: "down_A",
-          function: "command_print",
-          type: "dataflow",
-          firingLimit: 1,
-          config: {
-            executor: {
-              executable: "down_A",
-              args: "A #{leafSize} #{interfaceSize} tier_#{subtree.tier}_state #{subtree.id}_rhs tier_#{subtree.tier}_solution"
-            }
-          },
-          ins: ["tier_#{subtree.tier}_state", "#{subtree.id}_rhs"],
-          outs: ["tier_#{subtree.tier}_solution"]
-        })
+        add_leaf subtree.tier, subtree.id, leafSize, 'A'
+        add_postprocess subtree.tier
       when "leaf_A1"
-        tasks.push({
-          name: "down_A",
-          function: "command_print",
-          type: "dataflow",
-          firingLimit: 1,
-          config: {
-            executor: {
-              executable: "down_A",
-              args: "1 #{a1Size} #{interfaceSize} tier_#{subtree.tier}_state #{subtree.id}_rhs tier_#{subtree.tier}_solution"
-            }
-          },
-          ins: ["tier_#{subtree.tier}_state", "#{subtree.id}_rhs"],
-          outs: ["tier_#{subtree.tier}_solution"]
-        })
+        add_leaf subtree.tier, subtree.id, a1Size, '1'
+        add_postprocess subtree.tier
       when "leaf_AN"
-        tasks.push({
-          name: "down_A",
-          function: "command_print",
-          type: "dataflow",
-          firingLimit: 1,
-          config: {
-            executor: {
-              executable: "down_A",
-              args: "N #{anSize} #{interfaceSize} tier_#{subtree.tier}_state #{subtree.id}_rhs tier_#{subtree.tier}_solution"
-            }
-          },
-          ins: ["tier_#{subtree.tier}_state", "#{subtree.id}_rhs"],
-          outs: ["tier_#{subtree.tier}_solution"]
-        })
-
-
+        add_leaf subtree.tier, subtree.id, anSize, 'N'
+        add_postprocess subtree.tier
+        
   generate_eliminate = (subtree) ->
     
     add_generate_tier = (index) -> 
       tasks.push({
         name: "generate_tier",
-        function: "command_print",
+        function: "command",
         type: "dataflow",
         firingLimit: 1,
         config: {
@@ -163,7 +158,7 @@ generate_workflow = (tree) ->
     add_leaf = (tier_index, subtree_id, size, type = '') ->
       tasks.push({
         name: "production_A#{type}",
-        function: "command_print",
+        function: "command",
         type: "dataflow",
         firingLimit: 1,
         config: {
@@ -180,7 +175,7 @@ generate_workflow = (tree) ->
       when "eliminate"
         tasks.push({
           name: "merege",
-          function: "command_print",
+          function: "command",
           type: "dataflow",
           firingLimit: 1,
           config: {
