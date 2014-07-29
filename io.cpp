@@ -4,7 +4,7 @@
 boost::format outFormat("%30.25e");
 
 double * readMatrix(std::string filename, int n) {
-	std::fstream f(filename, std::ios_base::in);
+	std::fstream f(filename, std::ios::in);
 	return readMatrix(f, n);
 }
 
@@ -21,7 +21,7 @@ double * readMatrix(std::istream& f, int n) {
 }
 
 std::pair<double*, double*> readMatrixRhs(std::string filename, int n) {
-	std::fstream f(filename, std::ios_base::in);
+	std::fstream f(filename, std::ios::in);
 	return readMatrixRhs(f, n);
 }
 
@@ -43,7 +43,7 @@ std::pair<double*, double*> readMatrixRhs(std::istream& f, int n) {
 
 
 double * readVector(std::string filename, int n) {
-	std::fstream f(filename, std::ios_base::in);
+	std::fstream f(filename, std::ios::in);
 	return readVector(f, n);
 }
 

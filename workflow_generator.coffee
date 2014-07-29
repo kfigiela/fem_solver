@@ -1,5 +1,4 @@
 #!/usr/bin/env coffee
-console.dir = require 'cdir'
 fs = require 'fs'
 
 doc = """

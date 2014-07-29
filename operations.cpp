@@ -2,10 +2,30 @@
 #include <cstdio>
 #include <iostream>
 #include <vector>
-extern "C" {
-	#include "vecLib/clapack.h"
-	#include "vecLib/cblas.h"
-}
+#ifdef APPLE
+	extern "C" {
+		#include "vecLib/clapack.h"
+		#include "vecLib/cblas.h"
+	}
+#else
+	#include <cblas.h>
+	#include <lapacke.h>
+	
+	//
+	// int dgetrf_(int * M, int * N, double *A, int * lda, int* ipiv, int * status) {
+	// 	// (*status) = clapack_dgetrf(CblasColMajor, *M, *N, A, *lda, ipiv);
+	// 	return 0;
+	// }
+	// int dgetrs_(char *trans, int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int * ldb, int *status) {
+	// 	// (*status) = clapack_dgetrs(CblasColMajor, CblasNoTrans, *n, *nrhs, a, *lda, ipiv, b, *ldb); //FIXME 2nd arg
+	// 	return 0;
+	// }
+	//
+	// int dgesv_(int *n, int *nrhs, double *a, int *lda, int *ipiv, double *b, int *ldb, int *status) {
+	// 	// (*status) = clapack_dgesv(CblasColMajor, *n, *nrhs, a, *lda, ipiv, b, *ldb);
+	// 	return 0;
+	// }
+#endif
 
 
 void eliminate(double * matrix, double * rhs, int n, int m) {
@@ -194,7 +214,7 @@ void add(double * A1, double * A2, double * B1, double * B2, int n, double * out
 		
 		* G = A2,
 		* H = A2 + 2*n*n,
-		* I = A2 + n,
+		* I_ = A2 + n,
 		* J = A2 + 2*n*n + n,
 		
 		* K = B2,
@@ -238,7 +258,7 @@ void add(double * A1, double * A2, double * B1, double * B2, int n, double * out
 	copy2(oD, B, n, 3*n, 2*n);
 	copy2(oE, A, n, 3*n, 2*n);
 	zero2(oF, n, 3*n);
-	copy2(oG, I, n, 3*n, 2*n);
+	copy2(oG, I_, n, 3*n, 2*n);
 	zero2(oH, n, 3*n);
 	copy2(oI, J, n, 3*n, 2*n);
 		
@@ -264,7 +284,7 @@ void production_A(double * outA, double * outB, double * inA, double * inB, size
 		* F = inA + matrixSize * (interfaceSize + interiorSize) + interfaceSize,
 		* G = inA + interfaceSize + interiorSize,
 		* H = inA + matrixSize * interfaceSize + interfaceSize + interiorSize,
-		* I = inA + matrixSize * (interfaceSize + interiorSize) + interfaceSize + interiorSize,
+		* I_ = inA + matrixSize * (interfaceSize + interiorSize) + interfaceSize + interiorSize,
 		
 		* oA = outA,
 		* oB = outA + matrixSize * interiorSize,
@@ -302,7 +322,7 @@ void production_A(double * outA, double * outB, double * inA, double * inB, size
 	copy_rc(oF, C, interfaceSize, interfaceSize, matrixSize, matrixSize );
 	
 	// I
-	copy_rc(oI, I, interfaceSize, interfaceSize, matrixSize, matrixSize);
+	copy_rc(oI, I_, interfaceSize, interfaceSize, matrixSize, matrixSize);
 	
 	memcpy(oL, K, interfaceSize * sizeof(double));
 	memcpy(oK, L, interiorSize  * sizeof(double));
