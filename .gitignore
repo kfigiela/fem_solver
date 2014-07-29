@@ -9,3 +9,5 @@ production_AN
 down_A
 tsolve
 *.o
+
+node_modules/
