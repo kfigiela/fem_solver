@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <iostream>
 #include <vector>
-#ifdef APPLE
+#ifdef __APPLE__
 	extern "C" {
 		#include "vecLib/clapack.h"
 		#include "vecLib/cblas.h"
