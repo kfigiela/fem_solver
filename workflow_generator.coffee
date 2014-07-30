@@ -1,14 +1,15 @@
-#!/usr/bin/env coffee
+#!/usr/bin/env coffee --
 fs = require 'fs'
 
 doc = """
 Usage:
-  workflow_generator.coffee [options] <tierCount> <outfile> [--interfaceSize=<n>] [--a1Size=<n>] [--anSize=<n>] [--leafSize=<n>]
+  workflow_generator.coffee [options] <tierCount> <outfile> [--interfaceSize=<n>] [--a1Size=<n>] [--anSize=<n>] [--leafSize=<n>] [--3d]
   
   --interfaceSize=<n>   Size of iter interface [default: 5]
   --leafSize=<n>        Size of intermediate tier matrices [default: 17]
   --a1Size=<n>          Size of intermediate first tier matrix [default: 21]
   --anSize=<n>          Size of intermediate last tier matrix [default: 21]
+  --3d                  Sets the above to 19/75/117/83
 """
 {docopt} = require 'docopt'
 
@@ -19,6 +20,12 @@ leafSize      = parseInt(args['--leafSize'])
 a1Size        = parseInt(args['--a1Size'])
 anSize        = parseInt(args['--anSize'])
 tierCount     = parseInt(args['<tierCount>'])
+
+if args['--3d']
+  interfaceSize = 19
+  leafSize      = 75
+  a1Size        = 117
+  anSize        = 83
 
 generate_tree = -> 
   root = {type: "root", id: "root"}
@@ -211,7 +218,7 @@ generate_workflow = (tree) ->
   workflow
 
 tree = generate_tree()
-workflow =generate_workflow tree
+workflow = generate_workflow tree
 
 # console.log JSON.stringify(tasks, null, 4)
 
