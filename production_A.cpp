@@ -27,8 +27,6 @@ int main(int argc, char ** argv)
 
 	writeState(argv[4], C, Cr, matrixSize, interiorSize);	
 	writeExport(argv[5], C, Cr, matrixSize, interiorSize);
-
-	// writeMatrixRhs(C, Cr, matrixSize);
 	
 	return 0;
 }

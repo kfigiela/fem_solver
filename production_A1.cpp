@@ -17,7 +17,7 @@ int main(int argc, char ** argv)
 	std::pair<double*,double*> Ap = readMatrixRhs(argv[3], matrixSize);
 	double* A  = Ap.first;
 	double* Ar = Ap.second;
-		
+	
 	eliminate(A, Ar, matrixSize, interiorSize);
 	
 	writeState(argv[4], A, Ar, matrixSize, interiorSize);

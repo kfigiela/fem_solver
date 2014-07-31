@@ -22,9 +22,7 @@ int main(int argc, char ** argv)
 	double* Cr = new double[matrixSize];
 
 	production_AN(C, Cr, A, Ar, interfaceSize, matrixSize);
-	
-	
-	writeMatrixRhs(C,Cr,matrixSize);
+		
 	eliminate(C, Cr, matrixSize, fakeInteriorSize);
 
 	writeState(argv[4], C, Cr, matrixSize, fakeInteriorSize);	
