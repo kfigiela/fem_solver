@@ -7,7 +7,11 @@ production_A1
 production_A
 production_AN
 down_A
+test_solve
+test_eliminate
 tsolve
 *.o
 
 node_modules/
+tmp/
+test/
