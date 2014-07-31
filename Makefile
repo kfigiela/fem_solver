@@ -13,7 +13,7 @@ endif
 CXX=c++
 CC=cc
 
-SRCS = io.cpp operations.cpp
+SRCS = io.cpp operations.cpp eliminate.cpp
 OBJS = $(SRCS:.cpp=.o)
 MAIN = add.cpp eliminate.cpp merge.cpp test_solve.cpp
 
