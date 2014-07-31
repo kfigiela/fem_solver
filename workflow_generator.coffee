@@ -211,7 +211,7 @@ generate_workflow = (tree) ->
   generate_bs(tree.right)
   
   workflow.processes = tasks
-  workflow.ins = ([0...tierCount].map (i) -> "tier_#{i}" )
+  workflow.ins = []
   workflow.outs = ([0...tierCount].map (i) -> "tier_#{i}_solution" )
   workflow.signals = [].concat.apply([], tasks.map (t) -> t.outs).map((t) -> {name: t})
   
