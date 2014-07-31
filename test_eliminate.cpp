@@ -12,7 +12,7 @@ int main(int argc, char ** argv)
 	double* Ar = Ap.second;
 
 	eliminate(A, Ar, N, n);
-	writeMatrixRhs(A, Ar, N);
+  writeMatrixRhs(A, Ar, N);
 
 	return 0;
 }

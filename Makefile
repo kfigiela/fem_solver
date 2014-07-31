@@ -22,10 +22,10 @@ BINS=add eliminate merge solve down production_AN production_A1 production_A tso
 .PHONY: depend clean ubuntu
 
 # all:	add.out eliminate.out merge.out solve.out down.out production_A.out production_A1.out production_AN.out tsolve.out down_A.out
-all: add eliminate merge solve down production_AN production_A1 production_A tsolve down_A test_solve
+all: add test_eliminate merge solve down production_AN production_A1 production_A tsolve down_A test_solve
 
 add: $(OBJS)
-eliminate: $(OBJS)
+test_eliminate: $(OBJS)
 merge: $(OBJS)
 solve: $(OBJS)
 down: $(OBJS)
