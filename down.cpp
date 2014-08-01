@@ -32,8 +32,8 @@ int main(int argc, char **argv) {
   // writeRhs(Cr, N);
   // std::cout << std::endl;
 
-  writeLeftRhs(argv[4], C, Cr, N, n);
-  writeRightRhs(argv[5], C, Cr, N, n);
+  writeLeftRhs(argv[4], Cr, N, n);
+  writeRightRhs(argv[5], Cr, N, n);
 
   return 0;
 }

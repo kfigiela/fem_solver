@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
   double *Cr = new double[N];
 
   add(A, B, Ar, Br, n, C, Cr);
-  // writeMatrixRhs(argv[4], C, Cr, N);
+  writeMatrixRhs(C, Cr, N);
 
   return 0;
 }

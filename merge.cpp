@@ -28,9 +28,8 @@ int main(int argc, char **argv) {
 
   eliminate(C, Cr, N, n);
 
-  writeDebug(C, Cr, N);
-
   writeState(argv[4], C, Cr, N, n);
   writeExport(argv[5], C, Cr, N, n);
+
   return 0;
 }
