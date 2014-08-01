@@ -2,34 +2,34 @@
 #include "operations.h"
 #include "io.h"
 
-int main(int argc, char ** argv)
-{
-	if(argc != 6) {
-		std::cout << "usage: solve n inLeftMatrix inRightMatrix outLeftRhs outRightRhs" << std::endl;
-		exit(1);
-	}
-	
-	int n = atoi(argv[1]);
-	int N = 3*n;
+int main(int argc, char **argv) {
+  if (argc != 6) {
+    std::cout
+        << "usage: solve n inLeftMatrix inRightMatrix outLeftRhs outRightRhs"
+        << std::endl;
+    exit(1);
+  }
 
-	std::pair<double*,double*> Ap = readMatrixRhs(argv[2], 2*n);
-	double* A  = Ap.first;
-	double* Ar = Ap.second;
+  int n = atoi(argv[1]);
+  int N = 3 * n;
 
-	std::pair<double*,double*> Bp = readMatrixRhs(argv[3], 2*n);
-	double* B  = Bp.first;
-	double* Br = Bp.second;
-	
-	double* C = new double[N*N];
-	double* Cr = new double[N];
+  std::pair<double *, double *> Ap = readMatrixRhs(argv[2], 2 * n);
+  double *A = Ap.first;
+  double *Ar = Ap.second;
 
-	add(A,B,Ar,Br,n,C,Cr);
-	solve(C, Cr, N);
-	// writeMatrixRhs(C, Cr, N);
-	// std::cout << std::endl;
-	writeLeftRhs(argv[4], C, Cr, N, n);
-	writeRightRhs(argv[5], C, Cr, N, n);
+  std::pair<double *, double *> Bp = readMatrixRhs(argv[3], 2 * n);
+  double *B = Bp.first;
+  double *Br = Bp.second;
 
-	return 0;
+  double *C = new double[N * N];
+  double *Cr = new double[N];
+
+  add(A, B, Ar, Br, n, C, Cr);
+  solve(C, Cr, N);
+  // writeMatrixRhs(C, Cr, N);
+  // std::cout << std::endl;
+  writeLeftRhs(argv[4], C, Cr, N, n);
+  writeRightRhs(argv[5], C, Cr, N, n);
+
+  return 0;
 }
-

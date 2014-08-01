@@ -1,6 +1,7 @@
 #include "io.h"
 
-std::pair<double *, double *> readMatrixRhs(std::istream &f, int lda, int rows, int cols) {
+std::pair<double *, double *> readMatrixRhs(std::istream &f, int lda, int rows,
+                                            int cols) {
   double *m, *rhs;
   m = new double[rows * cols];
   rhs = new double[rows];
@@ -10,19 +11,19 @@ std::pair<double *, double *> readMatrixRhs(std::istream &f, int lda, int rows, 
   return std::make_pair(m, rhs);
 }
 
-void readVector(double * vec, std::istream& f, int n) {
+void readVector(double *vec, std::istream &f, int n) {
   for (int i = 0; i < n; i++)
     f.read(reinterpret_cast<char *>(&vec[i]), sizeof(double));
 }
 
-void readMatrixRhs(double * m, double * rhs, std::istream &f, int lda, int rows, int cols) {
+void readMatrixRhs(double *m, double *rhs, std::istream &f, int lda, int rows,
+                   int cols) {
   for (int i = 0; i < rows; i++) {
     for (int j = 0; j < cols; j++)
       f.read(reinterpret_cast<char *>(&m[j * lda + i]), sizeof(double));
     f.read(reinterpret_cast<char *>(&rhs[i]), sizeof(double));
-  }  
+  }
 }
-
 
 void writeRhs(std::ostream &f, double *rhs, int n) {
   for (int i = 0; i < n; i++) {
