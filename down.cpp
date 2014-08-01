@@ -22,24 +22,12 @@ int main(int argc, char ** argv)
 		C[i*N+i] = 1.0;
 	}
 	
-	std::fstream state(argv[2], std::ios_base::in);
-
-	for(int i = 0; i < n; i++) {
-		for(int j = 0; j < N; j++)
-			state >> C[j*N+i];
-		state >> Cr[i];
-	}
-
-	std::fstream rhs(argv[3], std::ios_base::in);
-
-	for(int i = 0; i < 2*n; i++) {
-		rhs >> Cr[n+i];
-	}
-
+  readMatrixRhs(C, Cr, argv[2], N, n, N);
+  
+  readVector(&Cr[n], argv[3], 2*n);
 
 	// writeMatrixRhs(C, Cr, N);
 	// std::cout << std::endl;
-
 	solve(C, Cr, N);
 
 	// writeRhs(Cr, N);

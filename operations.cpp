@@ -1,7 +1,5 @@
-#include "operations.h"
-#include <cstdio>
 #include <iostream>
-#include <vector>
+#include "operations.h"
 
 #ifdef __APPLE__
   extern "C" {
@@ -14,21 +12,23 @@
 #endif
 
 void solve(double * matrix, double * rhs, int n) {
-    std::vector<int> ipiv(n);
+  int ipiv[n];
   int status;
   int nrhs = 1;
+  
   dgesv_(
     /* N     */ &n,
     /* NRHS  */ &nrhs,
     /* A     */ matrix,
     /* LDA   */ &n,
-    /* IPIV  */ &*ipiv.begin(),
+    /* IPIV  */ ipiv,
     /* B     */ rhs,
     /* LDB   */ &n,
     /* INFO  */ &status
   );
   if(status != 0) {
-    std::cerr << "!!!!!!!!!!!!!!!!!dgesv returned " << status << std::endl;
+    std::cerr << "Solve failed, DGESV returned " << status << std::endl;
+    throw lapack_exception("DGESV failed");
   }
 }
 

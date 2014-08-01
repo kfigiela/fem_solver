@@ -1,5 +1,4 @@
 #include <iostream>
-
 #ifdef __APPLE__
   extern "C" {
     #include "vecLib/clapack.h"
@@ -9,6 +8,8 @@
   #include <cblas.h>
   #include <lapacke.h>
 #endif
+
+#include "eliminate.h"
 
 /*
 
@@ -26,7 +27,7 @@
 
 */
 
-bool eliminate(double * matrix, double * rhs, int n, int m) {
+void eliminate(double * matrix, double * rhs, int n, int m) {
   int info;
   int ipiv[m];
   int k = n - m;
@@ -50,8 +51,8 @@ bool eliminate(double * matrix, double * rhs, int n, int m) {
       /* INFO */ &info);
 
   if(info != 0) {
-    std::cerr << "Elimination failed. DGETRF failed " << info << std::endl;
-    return false;
+    std::cerr << "Elimination failed: LU decomposition not possible. DGETRF failed " << info << std::endl;
+    throw lapack_exception("DGETRF failed: LU decomposition not possible");
   }
 
 
@@ -69,7 +70,7 @@ bool eliminate(double * matrix, double * rhs, int n, int m) {
 
   if(info != 0) {
      std::cerr << "Elimination failed. DGETRS failed " << info << std::endl;
-     return false;
+    throw lapack_exception("DGETRS failed");
   }
 
 
@@ -88,7 +89,7 @@ bool eliminate(double * matrix, double * rhs, int n, int m) {
 
   if(info != 0) {
     std::cerr << "Elimination failed. DGETRS failed " << info << std::endl;
-    return false;
+    throw lapack_exception("DGETRS failed");
   }
 
   // 4: D = D - C * B
@@ -134,6 +135,4 @@ bool eliminate(double * matrix, double * rhs, int n, int m) {
   for(int i = m; i < n; i++)
     for(int j = 0; j < m; j++)
       matrix[j*n+i] = 0.0;
-
-  return true;
 }

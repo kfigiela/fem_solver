@@ -26,41 +26,36 @@ int main(int argc, char ** argv)
 		C[i*matrixSize+i] = 1.0;
 	}
 	
-	std::fstream state(argv[4], std::ios_base::in);
-	for(int i = 0; i < interiorSize; i++) {
-		for(int j = 0; j < matrixSize; j++)
-			state >> C[j*matrixSize+i];
-		state >> Cr[i];
-	}
-
-	std::fstream rhs(argv[5], std::ios_base::in);
-	for(int i = interiorSize; i < matrixSize; i++) {
-		rhs >> Cr[i];
-	}
-
+  readMatrixRhs(C, Cr, argv[4], matrixSize, interiorSize, matrixSize);
+  
+  readVector(&Cr[interiorSize], argv[5], matrixSize-interiorSize);
+  
 	solve(C, Cr, matrixSize);
+
 	
 	std::fstream f(argv[6], std::ios_base::out);
 	switch(argv[1][0]) {
 		case '1':
-			for(int i = 0; i < matrixSize; ++i)
-				f << outFormat % Cr[i] << std::endl;
-			// for(int i = 0; i < matrixSize-interfaceSize; ++i)
-			// 	f << outFormat % Cr[i] << std::endl;
+      writeRangeRhs(f, Cr, 0, matrixSize);
 			break;
 		case 'A':
-			for(int i = interiorSize; i < interiorSize+interfaceSize; ++i)
-				f << outFormat % Cr[i] << std::endl;
-			for(int i = 0; i < interiorSize; ++i)
-				f << outFormat % Cr[i] << std::endl;
-			for(int i = interiorSize+interfaceSize; i < matrixSize; ++i)
-				f << outFormat % Cr[i] << std::endl;
+      writeRangeRhs(f, Cr, interiorSize, interiorSize+interfaceSize);
+      // for(int i = interiorSize; i < interiorSize+interfaceSize; ++i)
+      //   f << outFormat % Cr[i] << std::endl;
+      writeRangeRhs(f, Cr, 0, interiorSize);
+      // for(int i = 0; i < interiorSize; ++i)
+      //   f << outFormat % Cr[i] << std::endl;
+      writeRangeRhs(f, Cr, interiorSize+interfaceSize, matrixSize);
+      // for(int i = interiorSize+interfaceSize; i < matrixSize; ++i)
+      //   f << outFormat % Cr[i] << std::endl;
 			break;
 		case 'N':
-			for(int i = matrixSize-2*interfaceSize; i < matrixSize; ++i)
-				f << outFormat % Cr[i] << std::endl;
-			for(int i = 0; i < matrixSize-2*interfaceSize; ++i)
-				f << outFormat % Cr[i] << std::endl;
+      writeRangeRhs(f, Cr, matrixSize-2*interfaceSize, matrixSize);
+      // for(int i = matrixSize-2*interfaceSize; i < matrixSize; ++i)
+      //   f << outFormat % Cr[i] << std::endl;
+      writeRangeRhs(f, Cr, 0, matrixSize-2*interfaceSize);
+      // for(int i = 0; i < matrixSize-2*interfaceSize; ++i)
+      //   f << outFormat % Cr[i] << std::endl;
 			break;
 		default:
 			std::cerr << "Invalid argument (expected 1, A or N)" << std::endl;
