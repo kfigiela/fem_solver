@@ -1,7 +1,7 @@
 UNAME_S := $(shell uname -s)
 
 ifeq ($(UNAME_S),Darwin)
-	CXX_FLAGS=-DYA_BLAS -DYA_LAPACK -DYA_BLASMULT
+	CXXFLAGS=-DYA_BLAS -DYA_LAPACK -DYA_BLASMULT
 	LDLIBS= -lblas -llapack -framework vecLib
 endif
 
