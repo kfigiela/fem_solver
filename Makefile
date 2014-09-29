@@ -17,7 +17,7 @@ SRCS = operations.cpp eliminate.cpp io_common.cpp io_bin.cpp
 OBJS = $(SRCS:.cpp=.o)
 MAIN = add.cpp eliminate.cpp merge.cpp test_solve.cpp
 
-BINS=add eliminate merge solve down production_AN production_A1 production_A down_A test_solve
+BINS=eliminate merge solve down production_AN production_A1 production_A down_A
 
 .PHONY: depend clean ubuntu
 
