@@ -1,0 +1,7 @@
+#!/usr/bin/env gnuplot
+
+file=system("echo $data_file")
+set term png
+set out file.'.png'
+set dgrid3d 128,128,4
+splot file using 1:2:3 with pm3d

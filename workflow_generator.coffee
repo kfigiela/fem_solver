@@ -210,9 +210,39 @@ generate_workflow = (tree) ->
   generate_bs(tree.left)
   generate_bs(tree.right)
   
+  tasks.push({
+    name: "concat",
+    function: "command",
+    type: "dataflow",
+    firingLimit: 1,
+    config: {
+      executor: {
+        executable: "sed",
+        args: '-n wresults ' + ([0...tierCount].map (i) -> "tier_#{i}_results" ).join(" ")
+      }
+    },
+    ins: ([0...tierCount].map (i) -> "tier_#{i}_results" )
+    outs: ["results"]
+  })
+  
+  tasks.push({
+    name: "plot",
+    function: "command",
+    type: "dataflow",
+    firingLimit: 1,
+    config: {
+      executor: {
+        executable: "env",
+        args: "data_file=results make_plot"
+      }
+    },
+    ins: ["results"]
+    outs: ["results.png"]
+  })
+  
   workflow.processes = tasks
   workflow.ins = []
-  workflow.outs = ([0...tierCount].map (i) -> "tier_#{i}_solution" )
+  workflow.outs = ["results.png"] 
   workflow.signals = [].concat.apply([], tasks.map (t) -> t.outs).map((t) -> {name: t})
   
   workflow
